@@ -2,6 +2,8 @@ rm(list=ls())
 library(grf)
 library(ggplot2)
 library(glue)
+#install.packages('ks')
+library(ks)
 set.seed(42)
 
 
@@ -36,21 +38,6 @@ get_y = function(X, theta, sigma, seed=NULL){
   n = nrow(X)
   return(theta(X) + rnorm(n, 0, sigma))
 }
-V_func = function(x, mu, sig, clip = NULL){
-  res = -dnorm(x, mean = mu, sd = sig)
-  if (!is.null(clip))
-    res = sign(res) * pmax(abs(res), clip)
-  return(res)
-}
-eps_tilde = function(X, Y, theta, sig, tau, clipV=NULL){
-  res = matrix(0, nrow = nrow(X), ncol = length(tau))
-  V = - V_func(theta(X), theta(X), sig, clip=clipV) ^ (-1)
-  I = Y <= theta(X)
-  for (i in 1:length(tau)){
-    res[, i] = V * (tau[i] - I)
-  }
-  return(res)
-}
 
 tau = c(0.5)
 sig = 1
@@ -58,50 +45,45 @@ width = 0.2
 beta = c(0, 1, 0, 4)
 p = 3
 c = 1
+grids = 50
+reps = 100
+
 
 
 rfs = list()
-reps = 100
 rmse_results = list()
-
-for (n in c(500,1000,2000)){
-  # Store sup-norm results for current n
-  sup_diffs = numeric(reps)
+#n=500
+#rep = 1
+for (n in c(500, 1000, 2000)){
+  sup_diffs = numeric(reps)   # Store sup-norm results for current n
   set.seed(123)
+  X_test = get_x(grids, c)  # New test set
   for (rep in 1:reps) {  
   X = get_x(n, c)
   theta = function(X) theta_polynomial(X, p, beta)
   Y = get_y(X, theta, sig, 42)
-  rfs[[as.character(n)]] = rf = grf::quantile_forest(X, Y, quantiles = tau)
-  alpha = get_forest_weights(rf)
-  theta_tilde = theta(X) - alpha %*% eps_tilde(X, Y, theta, sig, tau)
-  theta_hat = predict(rf,X)$predictions
-  # Compute sup-norm of the absolute difference
+  rfs[[as.character(n)]] = rf = grf::quantile_forest(X, Y, quantiles = tau, seed = 42)
+  
+   theta_test = theta(X_test)
+   theta_hat = predict(rf, X_test)$predictions
+  alpha = get_forest_weights(rf, X_test)  # Compute weights for test set
+  
+  kde_fit<- ks::kde(Y)  # Kernel density estimation
+  f_Y_theta <- - (predict(kde_fit, x = theta_hat) ) ^ (-1)
+  psi_matrix <- sapply(theta_hat, function(theta_t) tau - (Y <= theta_t))
+  
+  epsilon_tilde <- sapply(seq_along(theta_hat), function(i) -predict(kde_fit, x= theta_hat[i])^(-1) * psi_matrix[,i])
+  
+  theta_tilde = (theta_test + (alpha %*% epsilon_tilde)[1])
+  
+  #Compute sup-norm of the absolute difference
   sup_diffs[rep] = max(abs(theta_hat - theta_tilde))
   }
   
   # Compute RMSE comparing sup-norms to true theta
   true_theta_values = theta(X)
-  rmse = sqrt(mean((sup_diffs - max(abs(true_theta_values)))^2)) #is that correct?
+  rmse = mean(sup_diffs) 
   rmse_results[[as.character(n)]] = rmse
-
-  fn = glue(
-    'qRF_polynom___beta{paste(beta, collapse="_")}___',
-    'theta_tilde___',
-    'q{formatC(tau*100, width=3, flag="0")}___',
-    'sigma{formatC(sig*100, width=3, flag="0")}___',
-    'n{formatC(as.integer(n), width=4, flag="0")}',
-    '.png'
-  )
-  
-  png(file = fn, res = 100)
-  plot(X[, 'X1'], Y, type = 'p', pch = 20, cex = 0.09, xlab='X1')
-  lines(X[, 'X1'], theta_tilde, col = 'red', lwd = 2)
-  lines(X[, 'X1'], theta_hat, col = 'darkgreen', lwd = 2)
-  lines(X[, 'X1'], theta(X), col = 'blue', lty=2)
-  #legend("bottomright", legend = c("True Theta", "Theta Tilde", "Theta Hat"), 
-   #      col = c("blue", "red", "green"), lty = c(2, 1, 1), cex = 0.8)
-  dev.off()
   
 }
 
