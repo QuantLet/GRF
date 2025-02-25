@@ -279,5 +279,4 @@ for (x2 in c(0.3,0.5)){
   dev.off()
 }
 # removing undesirable variables ----
-rm(current_path,ptm)
-
+rm(c

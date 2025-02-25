@@ -45,34 +45,31 @@ width = 0.2
 beta = c(0, 1, 0, 4)
 p = 3
 c = 1
-grids = 50
+grids = 30
 reps = 100
-
-
 
 rfs = list()
 rmse_results = list()
-#n=500
-#rep = 1
+
 for (n in c(500, 1000, 2000)){
   sup_diffs = numeric(reps)   # Store sup-norm results for current n
   set.seed(123)
-  X_test = get_x(grids, c)  # New test set
   for (rep in 1:reps) {  
   X = get_x(n, c)
   theta = function(X) theta_polynomial(X, p, beta)
   Y = get_y(X, theta, sig, 42)
   rfs[[as.character(n)]] = rf = grf::quantile_forest(X, Y, quantiles = tau, seed = 42)
   
-   theta_test = theta(X_test)
-   theta_hat = predict(rf, X_test)$predictions
+  X_test = get_x_grid(grids, c)  # New test set
+  theta_test = theta(X_test)
+  theta_hat = predict(rf, X_test)$predictions
   alpha = get_forest_weights(rf, X_test)  # Compute weights for test set
   
   kde_fit<- ks::kde(Y)  # Kernel density estimation
-  f_Y_theta <- - (predict(kde_fit, x = theta_hat) ) ^ (-1)
-  psi_matrix <- sapply(theta_hat, function(theta_t) tau - (Y <= theta_t))
+  f_Y_theta <- - (predict(kde_fit, x = theta_test) ) ^ (-1)
+  psi_matrix <- sapply(theta_test, function(theta_t) tau - (Y <= theta_t))
   
-  epsilon_tilde <- sapply(seq_along(theta_hat), function(i) -predict(kde_fit, x= theta_hat[i])^(-1) * psi_matrix[,i])
+  epsilon_tilde <- sapply(seq_along(theta_test), function(i) -predict(kde_fit, x= theta_test[i])^(-1) * psi_matrix[,i])
   
   theta_tilde = (theta_test + (alpha %*% epsilon_tilde)[1])
   
@@ -81,7 +78,6 @@ for (n in c(500, 1000, 2000)){
   }
   
   # Compute RMSE comparing sup-norms to true theta
-  true_theta_values = theta(X)
   rmse = mean(sup_diffs) 
   rmse_results[[as.character(n)]] = rmse
   
