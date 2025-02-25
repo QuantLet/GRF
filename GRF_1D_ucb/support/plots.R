@@ -155,7 +155,7 @@ png(file = glue('images/',
                 '.png'),
     width=2000, height=1500)
 par(bg='transparent')
-plot(dist_T_max, col= 'blue', lwd = 5, cex.lab=3, cex.axis=2,
+plot(dist_T_max, col= 'blue', lwd = 5, cex.lab=3, cex.axis=2, 
      cex.main=3, cex.sub=3, main = 'Density plot of bootstrap test statistic')
 dev.off()
 
@@ -179,7 +179,7 @@ grid_CI_U = unlist(theta_hat[[1]])+(grid_q_star*sigma_hat[[1]])
       width=1600, height=800)
   par(bg='transparent')
   par(mar=c(5,6,4,1)+.1)
-  plot(1, type="n", xlab="X", ylab=bquote(theta), xlim=c(-0.5, 0.5), 
+  plot(1, type="n", xlab="X", ylab=bquote(theta), xlim=c(-0.5, 0.5), #ylim = range(c(-2.5,2.5))
        ylim=range(c(pd$theta_true,pd$theta_hat, pd$CI_L,pd$CI_U, pd$grid_CI_U,pd$grid_CI_L))
        , cex.axis = 2.5, cex.lab = 2.5
        )

@@ -7,15 +7,7 @@ library(rstudioapi)
 library(parallel)
 library(matrixStats)
 set.seed(42)
-#install.packages("matrixStats") ----
-rm(list=ls())
-library(grf)
-library(ggplot2)
-library(glue)
-library(rstudioapi)
-library(parallel)
-library(matrixStats)
-set.seed(42)
+
 
 # Getting the path of your current open file ----
 current_path = rstudioapi::getActiveDocumentContext()$path 

@@ -22,11 +22,15 @@ theta_triangle = function(x, cal_type, c = NULL){
     #theta = abs(x[[1]])+0.5
     #n = length(x[[1]])
     #theta = seq(0, 1, length.out = n)
-    #theta = pmax(1 - abs((x[[1]]) / 0.2), 0)
+    theta = pmax(1 - abs((x[[1]]) / 0.2), 0)
     #theta =  sin(x[[1]]*3*pi)
-    theta =  sin(x[[1]]*8*pi)
-    #theta = 1+x[[1]]+2*x[[1]]^2+3*x[[1]]^3
+    #theta =  sin(x[[1]]*8*pi)
+    #theta =  sin(x[[1]]*5*pi)
+    #theta =  sin(x[[1]]*3)
+    #theta =  sin(x[[1]]*5)
+    #theta =  sin(x[[1]]*8)
     #theta = sin(x[[1]])
+    #theta = 1+x[[1]]+2*x[[1]]^2+3*x[[1]]^3
   }
   return(theta)
 } 
@@ -45,7 +49,7 @@ get_y = function(X, theta, sigma, seed=10, reps = 1){
 
 fit_forest = function(X,Y,tau = 0.5,node_size = 5) { 
   #rand_for =  function(j)  grf::quantile_forest( X ,data.matrix(Y[,j]), quantile = tau, min.node.size = node_size)
-  rand_for =  function(j)  grf::regression_forest( X ,data.matrix(Y[,j]), min.node.size = node_size)
+  rand_for =  function(j)  grf::regression_forest( X ,data.matrix(Y[,j]), min.node.size = node_size, num.trees = 1000)
   reps = dim(Y)[2]
   rf = lapply(1:reps, rand_for)
   return(rf)
@@ -53,13 +57,13 @@ fit_forest = function(X,Y,tau = 0.5,node_size = 5) {
 
 predict_forest = function(rf, X_test){
   reps = length(rf)
-  theta_hat_test = lapply(1:reps, function(j) predict(rf[[j]], newdata = X_test)[["predictions"]])
-  return(theta_hat_test)
+  preds= lapply(1:reps, function(j) predict(rf[[j]],X_test, estimate.variance = TRUE))
+  return(preds)
 }
 
 weights_forest = function(rf, X_test){
   reps = length(rf)
-  w_test = lapply(1:reps,function(j) get_forest_weights(rf[[j]], newdata = X_test))
+  w_test = lapply(1:reps,function(j) as.matrix(get_forest_weights(rf[[j]], newdata = X_test)))
   return(w_test)
 }
 

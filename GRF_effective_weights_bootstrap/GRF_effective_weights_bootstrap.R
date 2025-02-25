@@ -55,8 +55,8 @@ power_curve_std = list()
 
 
 k = 1
-for (theta in theta) {
-for ( n in c(500,1000)){
+#for (theta in theta) {
+#for ( n in c(500, 1000)){
   T_stat = list()
   set.seed(100)
   ptm <- proc.time()
@@ -120,7 +120,7 @@ for ( n in c(500,1000)){
 
   png(file = fn, width=1500, height=1500)
   par(bg='transparent')
-  par(mar=c(5,6,4,1), mgp=c(4, 3, 0))
+  par(mar=c(5,6,4,1), mgp=c(8, 4, 0))
   plot(d, ylab='', xlab='',ylim = c(0,0.45),
        main= bquote(n  == .(n)),
        cex.axis = 4, cex.lab = 4, cex.main=4,
@@ -134,25 +134,25 @@ for ( n in c(500,1000)){
   png(file = glue('CI_','n{formatC(as.integer(n), width=4, flag="0")}_','theta{formatC(theta*100, width=3, flag="0")}_','.png')
       , width=1500, height=1500)
   par(bg='transparent')
-  par(mar=c(7,8,4,5)+1, mgp=c(6, 3, 0))
+  par(mar=c(10,11,4,5)+1, mgp=c(8, 4, 0))
   plot(rep(theta,reps), type = 'l', ylim=range(theta, CI[,1], CI[,2],CI_std[,1], CI_std[,2]), col='red',
        xlab="replications", ylab=bquote(theta),
        main= bquote(n  == .(n)),
-       cex.axis =4, cex.lab = 4, cex.main=4,
-      lwd = 3)
+       cex.axis =5, cex.lab = 5, cex.main=5,
+      lwd = 4)
   points(as.matrix(theta_hat), col='blue',pch = 19,cex = 2)
-  lines(CI[,1], col='black', lty = 1,lwd = 3)
-  lines(CI[,2], col='black', lty = 1,lwd = 3)
-  lines(CI_std[,1], col='blue4', lty = 6,lwd = 3)
-  lines(CI_std[,2], col='blue4', lty = 6,lwd = 3)
+  lines(CI[,1], col='black', lty = 1,lwd = 3, type = "b")
+  lines(CI[,2], col='black', lty = 1,lwd = 3, type = "b")
+  lines(CI_std[,1], col='blue', lty = 6,lwd = 3, type = "b")
+  lines(CI_std[,2], col='blue', lty = 6,lwd = 3, type = "b")
   dev.off()
-}
+#}
   power_curve[k] = (reps- count)/100
   power_curve_std[k] = (reps- count_std)/100
   print(k)
   k = k+1
 
-}  
+#}  
 
 ## only create power curve when a series of true parameters is provided
 if (length(theta) >1){

@@ -66,7 +66,7 @@ for (n in c(2000, 1000, 500)){
   theta = function(X) theta_polynomial(X, p, beta)
   Y = get_y(X, theta, sig, 42)
   rfs[[as.character(n)]] = rf = grf::quantile_forest(X, Y, quantiles = tau)
-  alpha = get_sample_weights(rf)
+  alpha = get_forest_weights(rf)
   theta_tilde = theta(X) + alpha %*% eps_tilde(X, Y, theta, sig, tau)
   
   fn = glue(
@@ -87,7 +87,7 @@ for (n in c(2000, 1000, 500)){
 }
 
 x1s = get_x_grid(101, c)
-alpha = lapply(rfs, function(x) get_sample_weights(x, newdata = x1s))
+alpha = lapply(rfs, function(x) get_forest_weights(x, newdata = x1s))
 alpha_max = max(sapply(alpha, function(a) max(a)))
 rf_X.orig = lapply(rfs, function(x) x$X.orig[, 'X1'])
 for (i in 1:nrow(x1s)){

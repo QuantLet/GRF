@@ -137,8 +137,8 @@ coverage_expected_std = mean(sapply(1:reps, function(k)
 
 T_stats[[as.character(n)]]  = T_stat
 CIs[[as.character(n)]]  = CI
-coverages[[as.character(n)]] = coverage
-coverages_std[[as.character(n)]] = coverage_std
+coverages[[as.character(n)]] = coverage_true
+coverages_std[[as.character(n)]] = coverage_true_std
 
 
 ## Calculation of uniform confidence bands ----
@@ -210,11 +210,12 @@ for (num in c(1,4)){
                     '.png'),
         width=1500, height=1500)
     par(bg='transparent')
-    par(mar=c(5,6,4,1)+.1)
-    plot(1, type="n", xlab="X", ylab=bquote(theta), xlim=c(-0.5, 0.5),
+    par(mar=c(10,11,4,1)+1)
+    par(mgp=c(8,4,0))
+    plot(1, type="n", xlab=bquote(X[1]), ylab=bquote(theta), xlim=c(-0.5, 0.5),
          ylim= range(pd$theta_true, pd$theta_hat, pd$CI_L, pd$CI_U+0.1),
          main= bquote(X[2]  == .(x2)),
-         cex.axis = 2.5, cex.lab = 2.5, cex.main=2.5)
+         cex.axis = 5, cex.lab = 5, cex.main=5)
     for (i in 1:num){
       pd = data.frame(X1=X$X1,X2=X$X2, theta_hat =  unlist(theta_hat[[i]]),
                       theta_true = theta_true, CI_L = CI[[i]][[1]], CI_U = CI[[i]][[2]] )
@@ -261,7 +262,7 @@ for (x2 in c(0.3,0.5)){
       width=1500, height=1500)
   par(bg='transparent')
   par(mar=c(5,6,4,1)+.1)
-  plot(1, type="n", xlab="X", ylab=bquote(theta), xlim=c(-0.5, 0.5), 
+  plot(1, type="n", xlab=bquote(X[1]), ylab=bquote(theta), xlim=c(-0.5, 0.5), 
        ylim=range(c(pd$theta_true,pd$theta_hat, pd$CI_L,pd$CI_U, pd$grid_CI_U,pd$grid_CI_L)),
        main= bquote(X[2]  == .(x2)),
        cex.axis = 2.5, cex.lab = 2.5, cex.main=2.5)
