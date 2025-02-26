@@ -46,7 +46,7 @@ beta = c(0, 1, 0, 4)
 p = 3
 c = 1
 grids = 30
-reps = 100
+reps = 1
 
 rfs = list()
 rmse_results = list()
@@ -101,7 +101,7 @@ for (n in c(500, 1000, 2000)){
   )
   
   png(file = fn, res = 100)
-  plot(X_test[, 'X1'], Y_test, type = 'p', pch = 20, cex = 0.09, xlab='X', main = glue("n = {n}"), ylim = c(-3,4))
+  plot(X[, 'X1'], Y, type = 'p', pch = 20, cex = 0.09, xlab='X', main = glue("n = {n}"), ylim = c(-7.5,7.5))
   lines(X_test[, 'X1'], theta_tilde, col = 'red', lwd = 2)
   lines(X_test[, 'X1'], theta_hat, col = 'darkgreen', lwd = 2)
   lines(X_test[, 'X1'], theta_test, col = 'blue', lty=2)
