@@ -50,18 +50,20 @@ reps = 100
 
 rfs = list()
 rmse_results = list()
+X_test = get_x_grid(grids, 0.8)  # New test set
+theta = function(X) theta_polynomial(X, p, beta)
+Y_test = get_y(X_test, theta, sig, 42)
+
 
 for (n in c(500, 1000, 2000)){
   sup_diffs = numeric(reps)   # Store sup-norm results for current n
   set.seed(123)
   for (rep in 1:reps) {  
     X = get_x(n, c)
-    theta = function(X) theta_polynomial(X, p, beta)
+    
     Y = get_y(X, theta, sig, 42)
     rfs[[as.character(n)]] = rf = grf::quantile_forest(X, Y, quantiles = tau, seed = 42)
     
-    X_test = get_x_grid(grids, 0.8)  # New test set
-    Y_test = get_y(X_test, theta, sig, 42)
     theta_test = theta(X_test)
     theta_hat = predict(rf, X_test)$predictions
     alpha = get_forest_weights(rf, X_test)  # Compute weights for test set
@@ -76,7 +78,7 @@ for (n in c(500, 1000, 2000)){
     psi_matrix = sapply(theta_test, function(theta_t) tau - (Y <= theta_t))
     
     #epsilon_tilde = sapply(seq_along(theta_test), function(i) - f_Y^(-1) * psi_matrix[,i])
-    epsilon_tilde_2 = - f_Y^(-1) * psi_matrix
+    epsilon_tilde = - f_Y^(-1) * psi_matrix
     
     theta_tilde = theta_test + diag(as.matrix(alpha %*% epsilon_tilde))
     
@@ -99,12 +101,12 @@ for (n in c(500, 1000, 2000)){
   )
   
   png(file = fn, res = 100)
-  plot(X_test[, 'X1'], Y_test, type = 'p', pch = 20, cex = 0.09, xlab='X', main = glue("n = {n}"))
+  plot(X_test[, 'X1'], Y_test, type = 'p', pch = 20, cex = 0.09, xlab='X', main = glue("n = {n}"), ylim = c(-3,4))
   lines(X_test[, 'X1'], theta_tilde, col = 'red', lwd = 2)
   lines(X_test[, 'X1'], theta_hat, col = 'darkgreen', lwd = 2)
   lines(X_test[, 'X1'], theta_test, col = 'blue', lty=2)
-  legend("bottomright", legend = c("True Theta", "Theta Tilde", "Theta Hat"), 
-        col = c("blue", "red", "green"), lty = c(2, 1, 1), cex = 0.8)
+  #legend("bottomright", legend = c("True Theta", "Theta Tilde", "Theta Hat"), 
+   #     col = c("blue", "red", "green"), lty = c(2, 1, 1), cex = 0.8)
   dev.off()
   }
 }
