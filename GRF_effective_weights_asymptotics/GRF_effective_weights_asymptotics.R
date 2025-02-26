@@ -60,18 +60,17 @@ for (n in c(500, 1000, 2000)){
   Y = get_y(X, theta, sig, 42)
   rfs[[as.character(n)]] = rf = grf::quantile_forest(X, Y, quantiles = tau, seed = 42)
   
-  X_test = get_x_grid(grids, c)  # New test set
+  X_test = get_x_grid(grids, 0.8)  # New test set
   theta_test = theta(X_test)
   theta_hat = predict(rf, X_test)$predictions
   alpha = get_forest_weights(rf, X_test)  # Compute weights for test set
   
   kde_fit<- ks::kde(Y)  # Kernel density estimation
-  f_Y_theta <- - (predict(kde_fit, x = theta_test) ) ^ (-1)
   psi_matrix <- sapply(theta_test, function(theta_t) tau - (Y <= theta_t))
   
   epsilon_tilde <- sapply(seq_along(theta_test), function(i) -predict(kde_fit, x= theta_test[i])^(-1) * psi_matrix[,i])
   
-  theta_tilde = (theta_test + (alpha %*% epsilon_tilde)[1])
+  theta_tilde = theta_test + diag(as.matrix(alpha %*% epsilon_tilde))
   
   #Compute sup-norm of the absolute difference
   sup_diffs[rep] = max(abs(theta_hat - theta_tilde))
