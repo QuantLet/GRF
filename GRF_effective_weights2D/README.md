@@ -13,7 +13,7 @@ Description: Estimation of effective weights alpha_i(x_1, x_2) for the infeasabl
 
 Keywords: RF, GRF, infeasable function, estimation, effective weights, bandwidth, contour
 
-Author: Marius Sterling
+Author: Marius Sterling', updated 20250907 by Andrei Theodor Ginavar & Siang-Li Jheng
 
 See also: 
 
