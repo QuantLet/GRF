@@ -9,9 +9,9 @@ Name of Quantlet: GRF_1D_ucb
 
 Published in: GRF
 
-Description: A simple code to construct bootstrap assisted uniform confidence bands for various 1D examples. The support folder contains a separate
+Description: A simple code to construct bootstrap assisted uniform confidence bands for various 1D examples. The support folder contains a separate file called 'functions' in which various functions can be commented/uncommented easily for calculation of power, size or coverage. The code also provides option to fit both quantile forest and regression forest, and relevant code lines need to be uncommented accordingly. Furthermore, same code can be used to make plots corresponding to changing bandwidth, grid size, theta, etc. The code is written to perform multiple corelated tasks and therefore separate files are not made for each task..
 
-Keywords: RF, GRF, infeasable function, estimation, effective weights, confidence bands, confidence intervals 
+Keywords: RF, GRF, infeasable function, estimation, effective weights, confidence bands, confidence intervals
 
 Author: Kainat Khowaja
 
